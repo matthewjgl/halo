@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/neo/Downloads/Code/Halo status --short)",
+      "Bash(xcodegen generate *)",
+      "Bash(xcodebuild -project Halo.xcodeproj -scheme Halo -configuration Debug -destination 'platform=macOS' build)",
+      "Bash(DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project Halo.xcodeproj -scheme Halo -configuration Debug -destination 'platform=macOS' build)",
+      "Bash(pkill -f \"Halo.app/Contents/MacOS/Halo\")"
+    ]
+  }
+}

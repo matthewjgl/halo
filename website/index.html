@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halo — Your notch, reimagined</title>
+  <meta name="description" content="Halo transforms your MacBook notch into a living control center. Music, calendar, weather, battery, notifications — all in one glowing strip.">
+  <meta property="og:title" content="Halo — Your notch, reimagined">
+  <meta property="og:description" content="Live activities for macOS. Music, calendar, weather, notifications — right in your notch.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://halonotch.com">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --purple: #b266ff;
+      --purple-dim: #9a4dff;
+      --purple-glow: rgba(178, 102, 255, 0.35);
+      --purple-glow-strong: rgba(178, 102, 255, 0.55);
+      --bg: #0a0a0b;
+      --bg-card: #111113;
+      --bg-card-hover: #161618;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.10);
+      --text-primary: rgba(255, 255, 255, 0.92);
+      --text-secondary: rgba(255, 255, 255, 0.56);
+      --text-tertiary: rgba(255, 255, 255, 0.32);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* --- Nav --- */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10, 10, 11, 0.82);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo img {
+      width: 28px;
+      height: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--purple);
+      color: #fff;
+      box-shadow: 0 0 24px var(--purple-glow), 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--purple-dim);
+      box-shadow: 0 0 36px var(--purple-glow-strong), 0 4px 16px rgba(0,0,0,0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.10);
+      border-color: var(--border-hover);
+    }
+
+    /* --- Hero --- */
+    .hero {
+      padding: 180px 32px 60px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: rgba(178, 102, 255, 0.08);
+      border: 1px solid rgba(178, 102, 255, 0.18);
+      color: var(--purple);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 28px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 7vw, 72px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #d9b3ff 0%, var(--purple) 50%, #8033cc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: clamp(17px, 2vw, 20px);
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-cta .btn { padding: 14px 32px; font-size: 15px; }
+
+    /* --- Notch preview --- */
+    .notch-preview {
+      max-width: 680px;
+      margin: 60px auto 0;
+      position: relative;
+    }
+
+    .notch-mock {
+      background: #000;
+      border-radius: 0 0 22px 22px;
+      padding: 14px 20px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.5),
+        0 0 60px var(--purple-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-top: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .notch-mock::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 34px;
+      background: #0a0a0b;
+      border-radius: 0 0 18px 18px;
+    }
+
+    .notch-left, .notch-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    .notch-album {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2a1a3e, #1a0a2e);
+      border: 1px solid rgba(178, 102, 255, 0.2);
+    }
+
+    .notch-text { display: flex; flex-direction: column; gap: 2px; }
+    .notch-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .notch-artist { font-size: 10px; color: var(--text-secondary); }
+
+    .notch-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .notch-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      font-size: 11px;
+    }
+
+    .notch-weather {
+      text-align: right;
+      font-size: 11px;
+    }
+
+    .notch-temp { font-size: 16px; font-weight: 700; }
+    .notch-condition { color: var(--text-secondary); font-size: 10px; }
+
+    /* --- Video demo --- */
+    .video-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 32px 40px;
+    }
+
+    .video-container {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 48px rgba(0, 0, 0, 0.4), 0 0 80px var(--purple-glow);
+      aspect-ratio: 16 / 9;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: linear-gradient(135deg, rgba(20, 10, 30, 0.95), rgba(10, 10, 11, 0.95));
+    }
+
+    .video-placeholder .play-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 32px var(--purple-glow-strong);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .video-placeholder .play-icon:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 48px var(--purple-glow-strong);
+    }
+
+    .video-placeholder p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    /* --- Section shared --- */
+    section { padding: 80px 32px; }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    .section-header p {
+      color: var(--text-secondary);
+      font-size: 17px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* --- Features grid --- */
+    .features {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.25s ease;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(178, 102, 255, 0.08);
+      border: 1px solid rgba(178, 102, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* --- SDK section --- */
+    .sdk {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .sdk-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .sdk-text h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .sdk-text h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+
+    .sdk-text p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+
+    .code-block {
+      background: #0d0d0f;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .code-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .code-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .code-block pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .code-block .kw { color: var(--purple); }
+    .code-block .str { color: #7dd3a0; }
+    .code-block .fn { color: #79c0ff; }
+    .code-block .cm { color: var(--text-tertiary); }
+
+    /* --- CTA --- */
+    .cta {
+      text-align: center;
+      padding: 120px 32px;
+      position: relative;
+    }
+
+    .cta::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 400px;
+      background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0.25;
+    }
+
+    .cta h2 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      color: var(--text-secondary);
+      font-size: 18px;
+      margin-bottom: 36px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* --- Footer --- */
+    footer {
+      padding: 40px 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    footer p {
+      color: var(--text-tertiary);
+      font-size: 13px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      color: var(--text-tertiary);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text-secondary); }
+
+    /* --- Hamburger button --- */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 110;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-primary);
+      margin: 5px 0;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .nav-hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .nav-hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* --- Mobile overlay --- */
+    .nav-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 98;
+    }
+
+    .nav-overlay.active { display: block; }
+
+    /* --- Responsive --- */
+    @media (max-width: 768px) {
+      nav { padding: 12px 20px; }
+
+      .nav-hamburger { display: block; }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background: rgba(10, 10, 11, 0.96);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 80px 28px 40px;
+        gap: 8px;
+        border-left: 1px solid var(--border);
+        transition: right 0.3s ease;
+        z-index: 99;
+      }
+
+      .nav-links.active { right: 0; }
+
+      .nav-links a {
+        font-size: 16px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-links .btn-primary {
+        margin-top: 16px;
+        justify-content: center;
+        padding: 14px 22px;
+        border-bottom: none;
+      }
+
+      section { padding: 60px 20px; }
+      .hero { padding: 120px 20px 48px; }
+      .hero-logo { width: 60px; height: 60px; margin-bottom: 24px; }
+      .hero h1 { font-size: clamp(32px, 8vw, 48px); }
+      .hero p { font-size: 16px; margin-bottom: 28px; }
+      .hero-cta { flex-direction: column; align-items: center; gap: 12px; }
+      .hero-cta .btn { width: 100%; max-width: 300px; justify-content: center; }
+
+      .video-section { padding: 24px 16px 24px; }
+      .video-container { border-radius: 12px; }
+
+      .section-header { margin-bottom: 36px; }
+      .section-header p { font-size: 15px; }
+
+      .features-grid { grid-template-columns: 1fr; gap: 12px; }
+      .feature-card { padding: 22px; }
+
+      .sdk-content { grid-template-columns: 1fr; gap: 28px; }
+      .code-block pre { font-size: 12px; padding: 16px; }
+
+      .cta { padding: 80px 20px; }
+      .cta h2 { font-size: clamp(28px, 6vw, 40px); }
+      .cta p { font-size: 16px; }
+      .cta-buttons { flex-direction: column; align-items: center; gap: 12px; }
+      .cta-buttons .btn { width: 100%; max-width: 300px; justify-content: center; }
+
+      footer { padding: 28px 20px; flex-direction: column; text-align: center; }
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeUp 0.6s ease forwards;
+      opacity: 0;
+    }
+
+    .animate-in:nth-child(2) { animation-delay: 0.1s; }
+    .animate-in:nth-child(3) { animation-delay: 0.2s; }
+    .animate-in:nth-child(4) { animation-delay: 0.3s; }
+    .animate-in:nth-child(5) { animation-delay: 0.4s; }
+    .animate-in:nth-child(6) { animation-delay: 0.5s; }
+
+    .hero-badge, .hero h1, .hero p, .hero-cta, .notch-preview {
+      animation: fadeUp 0.7s ease forwards;
+      opacity: 0;
+    }
+    .hero h1 { animation-delay: 0.1s; }
+    .hero p { animation-delay: 0.2s; }
+    .hero-cta { animation-delay: 0.3s; }
+    .notch-preview { animation-delay: 0.45s; }
+
+    /* --- Glow ring (logo in hero) --- */
+    .hero-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 32px;
+      position: relative;
+      animation: fadeUp 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .hero-logo::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--purple), transparent, var(--purple));
+      opacity: 0.3;
+      filter: blur(12px);
+      animation: spin 8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hero-logo img {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* --- Pill labels --- */
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(178, 102, 255, 0.08);
+      color: var(--purple);
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <img src="logo.png" alt="Halo">
+      Halo
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="#features" onclick="closeMenu()">Features</a>
+      <a href="#extensions" onclick="closeMenu()">Extensions</a>
+      <a href="https://github.com/matthewjgl/halo" target="_blank" onclick="closeMenu()">GitHub</a>
+      <a href="Halo.dmg" download class="btn btn-primary" onclick="closeMenu()">Download</a>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+  <div class="nav-overlay" id="nav-overlay" onclick="closeMenu()"></div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-logo">
+      <img src="logo.png" alt="Halo">
+    </div>
+    <div class="hero-badge">macOS Sonoma+ &middot; Free &amp; Open Source</div>
+    <h1>Your notch,<br><span class="gradient">reimagined.</span></h1>
+    <p>Halo transforms the MacBook notch into a living control center. Music, calendar, weather, battery, notifications &mdash; all in one glowing strip.</p>
+    <div class="hero-cta">
+      <a href="Halo.dmg" download class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download for Mac
+      </a>
+      <a href="https://github.com/matthewjgl/halo" class="btn btn-secondary" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        View Source
+      </a>
+    </div>
+
+  </section>
+
+  <!-- Video Demo -->
+  <div class="video-section">
+    <div class="video-container">
+      <video id="demo-video" playsinline muted loop autoplay>
+        <source src="demo.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <script>
+    function playDemo() {
+      const video = document.getElementById('demo-video');
+      const placeholder = document.getElementById('video-placeholder');
+      if (video.src || video.querySelector('source')?.src) {
+        video.play().then(() => {
+          placeholder.style.display = 'none';
+        }).catch(() => {});
+      }
+    }
+  </script>
+
+  <!-- Features -->
+  <section id="features" class="features">
+    <div class="section-header">
+      <h2>Everything in your notch</h2>
+      <p>Eight built-in modules that make the dead pixel zone the most useful part of your screen.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-in">
+        <div class="feature-icon">&#127925;</div>
+        <h3>Now Playing</h3>
+        <p>See what's playing, skip tracks, scrub the timeline. Works with Spotify, Apple Music, and any media app.</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feature-icon">&#128267;</div>
+        <h3>Battery</h3>
+        <p>Glanceable charge level, time remaining, and charging status. Color-coded so you never miss low battery.</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feature-icon">&#128197;</div>
+        <h3>Calendar</h3>
+        <p>Upcoming events, countdowns, and one-click join for video calls. Syncs with your system calendars.</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feature-icon">&#9925;</div>
+        <h3>Weather</h3>
+        <p>Current conditions, high/low, and location. All from Apple Weather &mdash; no API key needed.</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feature-icon">&#128276;</div>
+        <h3>Notifications</h3>
+        <p>Surface incoming notifications in the notch. Tap to open or dismiss without breaking flow.</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feature-icon">&#128247;</div>
+        <h3>Shelf</h3>
+        <p>Drag files onto the notch to stash them temporarily. A clipboard tray that's always within reach.</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feature-icon">&#128266;</div>
+        <h3>System HUD</h3>
+        <p>Volume and brightness changes appear in the notch instead of the default macOS overlay.</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feature-icon">&#128225;</div>
+        <h3>Teleprompter</h3>
+        <p>Paste a script and read it right below your camera. Perfect for video calls and recordings.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Extensions SDK -->
+  <section id="extensions" class="sdk">
+    <div class="sdk-content">
+      <div class="sdk-text">
+        <h3>Extension SDK</h3>
+        <h2>Build your own modules</h2>
+        <p>Write a JavaScript file, drop it in a folder, and your module appears in the notch. No Xcode, no compilation, no App Store review.</p>
+        <a href="https://github.com/matthewjgl/halo" class="btn btn-secondary" target="_blank">Read the docs</a>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-dot"></span>
+          <span class="code-dot"></span>
+          <span class="code-dot"></span>
+        </div>
+        <pre><span class="cm">// pomodoro.js</span>
+<span class="fn">Halo</span>.<span class="fn">registerModule</span>({
+  <span class="fn">onInit</span>() {
+    <span class="kw">this</span>.remaining = <span class="str">25 * 60</span>;
+    <span class="fn">Halo</span>.island.<span class="fn">setCompactView</span>({
+      text: <span class="str">"25:00"</span>,
+      icon: <span class="str">"timer"</span>
+    });
+  },
+  <span class="fn">onAction</span>(<span class="str">"start"</span>) {
+    <span class="fn">Halo</span>.<span class="fn">playFeedback</span>(<span class="str">"success"</span>);
+  }
+});</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="download" class="cta">
+    <h2>Ready to glow up<br>your notch?</h2>
+    <p>Free, open source, and built for macOS Sonoma and later. Download in seconds.</p>
+    <div class="cta-buttons">
+      <a href="Halo.dmg" download class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download for Mac
+      </a>
+      <a href="https://github.com/matthewjgl/halo" class="btn btn-secondary" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Vedit. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="https://github.com/matthewjgl/halo" target="_blank">GitHub</a>
+      <a href="https://twitter.com/vedit" target="_blank">Twitter</a>
+    </div>
+  </footer>
+
+  <!-- Mobile menu toggle -->
+  <script>
+    function toggleMenu() {
+      document.getElementById('nav-hamburger').classList.toggle('active');
+      document.getElementById('nav-links').classList.toggle('active');
+      document.getElementById('nav-overlay').classList.toggle('active');
+      document.body.style.overflow = document.getElementById('nav-links').classList.contains('active') ? 'hidden' : '';
+    }
+    function closeMenu() {
+      document.getElementById('nav-hamburger').classList.remove('active');
+      document.getElementById('nav-links').classList.remove('active');
+      document.getElementById('nav-overlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  </script>
+
+  <!-- Scroll animation observer -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animate-in').forEach(el => {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
