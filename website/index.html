@@ -9,6 +9,18 @@
   <meta property="og:description" content="Live activities for macOS. Music, calendar, weather, notifications — right in your notch.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://halonotch.com">
+  <meta property="og:site_name" content="Halo">
+  <meta property="og:image" content="https://halonotch.com/logo.png">
+  <meta property="og:image:secure_url" content="https://halonotch.com/logo.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt" content="Halo — live activities for your MacBook notch">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Halo — Your notch, reimagined">
+  <meta name="twitter:description" content="Live activities for macOS. Music, calendar, weather, notifications — right in your notch.">
+  <meta name="twitter:image" content="https://halonotch.com/logo.png">
+  <meta name="twitter:image:alt" content="Halo — live activities for your MacBook notch">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -196,88 +208,6 @@
     }
 
     .hero-cta .btn { padding: 14px 32px; font-size: 15px; }
-
-    /* --- Notch preview --- */
-    .notch-preview {
-      max-width: 680px;
-      margin: 60px auto 0;
-      position: relative;
-    }
-
-    .notch-mock {
-      background: #000;
-      border-radius: 0 0 22px 22px;
-      padding: 14px 20px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.5),
-        0 0 60px var(--purple-glow),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-top: none;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .notch-mock::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 200px;
-      height: 34px;
-      background: #0a0a0b;
-      border-radius: 0 0 18px 18px;
-    }
-
-    .notch-left, .notch-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 1;
-    }
-
-    .notch-album {
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #2a1a3e, #1a0a2e);
-      border: 1px solid rgba(178, 102, 255, 0.2);
-    }
-
-    .notch-text { display: flex; flex-direction: column; gap: 2px; }
-    .notch-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
-    .notch-artist { font-size: 10px; color: var(--text-secondary); }
-
-    .notch-controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .notch-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-primary);
-      font-size: 11px;
-    }
-
-    .notch-weather {
-      text-align: right;
-      font-size: 11px;
-    }
-
-    .notch-temp { font-size: 16px; font-weight: 700; }
-    .notch-condition { color: var(--text-secondary); font-size: 10px; }
 
     /* --- Video demo --- */
     .video-section {
